@@ -15,23 +15,23 @@ serie = ts(Dados[,1], start = c(2000,1), end = c(2020,2),frequency = 12) %>% win
 
 #---------------------------------------------------------HOLT----------------------------------------------------------------------------------------------
 
-HOLT = function (x,Data_IN,Data_OUT,Dados_reais_OUT){
+HOLT = function (x,Data_IN,Data_OUT,Dados_reais_OUT,h){
   
-  HOLT =holt(x, h=24)
+  HOLT =holt(x, h=h)
   print(HOLT[["model"]])
   
-Previs„o_D= data.frame(Data_IN, Dados_reais_IN = (HOLT[["x"]]), Previs„o_IN = (HOLT[["fitted"]]))
-Previs„o_F= data.frame(Data_OUT, Dados_reais_OUT, Previs„o_OUT = (HOLT[["mean"]]))
+Previs√£o_D= data.frame(Data_IN, Dados_reais_IN = (HOLT[["x"]]), Previs√£o_IN = (HOLT[["fitted"]]))
+Previs√£o_F= data.frame(Data_OUT, Dados_reais_OUT, Previs√£o_OUT = (HOLT[["mean"]]))
 
 #Erro_IN
-Erro_IN = data.frame(MAPE_IN = mape(Previs„o_D$Dados_reais_IN, Previs„o_D$Previs„o_IN)*100,
-                     MAE_IN = mae(Previs„o_D$Dados_reais_IN, Previs„o_D$Previs„o_IN),
-                     RMSE_IN =rmse(Previs„o_D$Dados_reais_IN, Previs„o_D$Previs„o_IN))
+Erro_IN = data.frame(MAPE_IN = mape(Previs√£o_D$Dados_reais_IN, Previs√£o_D$Previs√£o_IN)*100,
+                     MAE_IN = mae(Previs√£o_D$Dados_reais_IN, Previs√£o_D$Previs√£o_IN),
+                     RMSE_IN =rmse(Previs√£o_D$Dados_reais_IN, Previs√£o_D$Previs√£o_IN))
 
 #Erro_OUT                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         
-Erro_OUT = data.frame(MAPE_OUT = mape(Previs„o_F$Dados_reais_OUT, Previs„o_F$Previs„o_OUT)*100,
-                      MAE_OUT = mae(Previs„o_F$Dados_reais_OUT, Previs„o_F$Previs„o_OUT),
-                      RMSE_OUT = rmse(Previs„o_F$Dados_reais_OUT, Previs„o_F$Previs„o_OUT))
+Erro_OUT = data.frame(MAPE_OUT = mape(Previs√£o_F$Dados_reais_OUT, Previs√£o_F$Previs√£o_OUT)*100,
+                      MAE_OUT = mae(Previs√£o_F$Dados_reais_OUT, Previs√£o_F$Previs√£o_OUT),
+                      RMSE_OUT = rmse(Previs√£o_F$Dados_reais_OUT, Previs√£o_F$Previs√£o_OUT))
 
 Parametros= c(HOLT[["model"]][["loglik"]], HOLT[["model"]][["aic"]], HOLT[["model"]][["bic"]], HOLT[["model"]][["aicc"]],
                        HOLT[["model"]][["par"]][["alpha"]], HOLT[["model"]][["par"]][["beta"]],
@@ -45,20 +45,20 @@ wb = createWorkbook()
 
 sheet = createSheet(wb, "Prev.in")
 cs1 <- CellStyle(wb) + Font(wb, isBold=TRUE) + Border()  # header
-addDataFrame(Previs„o_D, sheet=sheet, startColumn=1, row.names= FALSE, colnamesStyle=cs1)
+addDataFrame(Previs√£o_D, sheet=sheet, startColumn=1, row.names= FALSE, colnamesStyle=cs1)
 addDataFrame(Erro_IN, sheet=sheet, startColumn=4, row.names= FALSE, colnamesStyle=cs1)
 
 sheet = createSheet(wb, "Prev.out")
-addDataFrame(Previs„o_F, sheet=sheet, startColumn=1, row.names= FALSE, colnamesStyle=cs1)
+addDataFrame(Previs√£o_F, sheet=sheet, startColumn=1, row.names= FALSE, colnamesStyle=cs1)
 addDataFrame(Erro_OUT, sheet=sheet, startColumn=4, row.names= FALSE, colnamesStyle=cs1)
 
-sheet = createSheet(wb, "Par‚metros")
+sheet = createSheet(wb, "Par√¢metros")
 addDataFrame(Parametros, sheet=sheet, startColumn=1, col.names= FALSE, colnamesStyle=cs1)
 
 saveWorkbook(wb, "Holt sem amortecimento.xlsx")
 
 }
   
-HOLT(serie, Data[1:156], Data[157:180],Dados[157:180,1])
+HOLT(serie, Data[1:156], Data[157:180],Dados[157:180,1],24)
 
 
