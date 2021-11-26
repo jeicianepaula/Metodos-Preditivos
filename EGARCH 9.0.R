@@ -6,7 +6,7 @@ library(rugarch)
 library(erer)
 
 #--------------------------------------------------EXPORTACAODE DADOS-------------------------------------------------------------------------------------------
-#Expota e separa os dados tipo date dos dados para formaÁ„o das series temporais
+#Expota e separa os dados tipo date dos dados para forma√ß√£o das series temporais
 Ex = read.xlsx(file.choose(), header = T,sheetIndex = 1)
 Data= Ex[,1]
 Dados= Ex[,-1]
@@ -16,29 +16,29 @@ Dados= Ex[,-1]
 serie = ts(Dados[,1], start = c(2000,1), end = c(2020,2),frequency = 12) %>% window(end = c(2012,12))
 
 #---------------------------------------------------------EGARCH----------------------------------------------------------------------------------------------
-EGARCH= function (x,Data_IN,Data_OUT,Dados_reais_OUT){
-#Faz a modelagem e previs„o
+EGARCH= function (x,Data_IN,Data_OUT,Dados_reais_OUT, h){
+#Faz a modelagem e previs√£o
 egarchspec = ugarchspec(variance.model = list(model = "eGARCH", garchOrder = c(1,1)), mean.model = list(armaOrder = c (1,1)))
 EGARCH= ugarchfit(egarchspec, x, solver ='hybrid')
-prevegarch = ugarchforecast(EGARCH, n.ahead= 24)
+prevegarch = ugarchforecast(EGARCH, n.ahead= h)
 
 #cria dois arquivos do tipo data.frame para armazenar as informacoes de previsao dentro e fora da amostra
-Previs„o_D = data.frame(Data_IN, Dados_reais_IN = (prevegarch@model[["modeldata"]][["data"]]), Previs„o_IN = (EGARCH@fit[["fitted.values"]]))
-Previs„o_F= data.frame(Data_OUT, Dados_reais_OUT, Previs„o_OUT = prevegarch@forecast[["seriesFor"]])
-names(Previs„o_F)[3]=c("Previs„o_OUT")
+Previs√£o_D = data.frame(Data_IN, Dados_reais_IN = (prevegarch@model[["modeldata"]][["data"]]), Previs√£o_IN = (EGARCH@fit[["fitted.values"]]))
+Previs√£o_F= data.frame(Data_OUT, Dados_reais_OUT, Previs√£o_OUT = prevegarch@forecast[["seriesFor"]])
+names(Previs√£o_F)[3]=c("Previs√£o_OUT")
 
 #calcula os erros de previsao dentro e fora da amostra pelas metricas de erros e amarzena em um data.frame
-Previs„o = prevegarch@forecast[["seriesFor"]]
-Erro_IN = data.frame(MAPE_IN = mape(Previs„o_D$Dados_reais_IN, Previs„o_D$Previs„o_IN)*100,
-                     MAE_IN = mae(Previs„o_D$Dados_reais_IN, Previs„o_D$Previs„o_IN),
-                     RMSE_IN =rmse(Previs„o_D$Dados_reais_IN, Previs„o_D$Previs„o_IN))
+Previs√£o = prevegarch@forecast[["seriesFor"]]
+Erro_IN = data.frame(MAPE_IN = mape(Previs√£o_D$Dados_reais_IN, Previs√£o_D$Previs√£o_IN)*100,
+                     MAE_IN = mae(Previs√£o_D$Dados_reais_IN, Previs√£o_D$Previs√£o_IN),
+                     RMSE_IN =rmse(Previs√£o_D$Dados_reais_IN, Previs√£o_D$Previs√£o_IN))
                      print(Erro_IN)
-Erro_OUT = data.frame(MAPE_OUT = mape(Previs„o_F$Dados_reais_OUT, Previs„o)*100,
-                      MAE_OUT = mae(Previs„o_F$Dados_reais_OUT,Previs„o),
-                      RMSE_OUT = rmse(Previs„o_F$Dados_reais_OUT,Previs„o))
+Erro_OUT = data.frame(MAPE_OUT = mape(Previs√£o_F$Dados_reais_OUT, Previs√£o)*100,
+                      MAE_OUT = mae(Previs√£o_F$Dados_reais_OUT,Previs√£o),
+                      RMSE_OUT = rmse(Previs√£o_F$Dados_reais_OUT,Previs√£o))
                       print(Erro_OUT)
 
-#Armazena os par‚metros da momdelagem em um data.frame
+#Armazena os par√¢metros da momdelagem em um data.frame
 Parametros = data.frame(EGARCH@fit[["coef"]])
 
 #o planilhador cria e exporta os dados obtidos para um planilha de excel
@@ -48,20 +48,20 @@ wb = createWorkbook()
 
 sheet = createSheet(wb, "Prev.in")
 cs1 <- CellStyle(wb) + Font(wb, isBold=TRUE) + Border()  # header
-addDataFrame(Previs„o_D, sheet=sheet, startColumn=1, row.names= FALSE, colnamesStyle=cs1)
+addDataFrame(Previs√£o_D, sheet=sheet, startColumn=1, row.names= FALSE, colnamesStyle=cs1)
 addDataFrame(Erro_IN, sheet=sheet, startColumn=4, row.names= FALSE, colnamesStyle=cs1)
 
 sheet = createSheet(wb, "Prev.out")
-addDataFrame(Previs„o_F, sheet=sheet, startColumn=1, row.names= FALSE, colnamesStyle=cs1)
+addDataFrame(Previs√£o_F, sheet=sheet, startColumn=1, row.names= FALSE, colnamesStyle=cs1)
 addDataFrame(Erro_OUT, sheet=sheet, startColumn=4, row.names= FALSE, colnamesStyle=cs1)
 
-sheet = createSheet(wb, "Par‚metros")
+sheet = createSheet(wb, "Par√¢metros")
 addDataFrame(Parametros, sheet=sheet, startColumn=1, col.names= FALSE, colnamesStyle=cs1)
 
 saveWorkbook(wb, "EGARCH.xlsx")
 
-return(Previs„o)
+return(Previs√£o)
 
 }
 
-EGARCH(serie,Data[1:156],Data[157:180],Dados[157:180,1])
+EGARCH(serie,Data[1:156],Data[157:180],Dados[157:180,1], 24)
